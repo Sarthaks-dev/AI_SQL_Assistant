@@ -1,4 +1,9 @@
 # AI SQL Query Generator & Database Assistant
+## 🚀 Live Demo
+
+**Live Application:** [AI SQL Query Generator & Database Assistant](https://aisqlassistant-dvzjpesml8fft94psgt9w8.streamlit.app/)
+
+> The application is deployed on Streamlit Community Cloud and uses Groq for natural-language SQL generation and Aiven MySQL for cloud database execution.
 
 An AI-powered prototype that converts natural-language questions into MySQL SQL queries, validates them for safety, executes them, and presents the results with automatic visualizations and plain-English explanations.
 
