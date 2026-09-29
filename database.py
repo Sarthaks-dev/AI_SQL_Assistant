@@ -15,14 +15,33 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def _get_setting(key, default=""):
+    """
+    Retrieve configuration from Streamlit secrets first, falling back to os.getenv().
+    Safely handles environments where Streamlit or secrets are not available.
+    """
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets") and key in st.secrets:
+            val = st.secrets[key]
+            if val is not None and str(val) != "":
+                return str(val)
+    except Exception:
+        pass
+    val = os.getenv(key)
+    if val is not None and str(val) != "":
+        return str(val)
+    return default
+
+
 def get_db_config():
-    """Retrieve database configuration from environment variables."""
+    """Retrieve database configuration from Streamlit secrets or environment variables."""
     return {
-        "host": os.getenv("MYSQL_HOST", "localhost"),
-        "port": int(os.getenv("MYSQL_PORT", "3306")),
-        "user": os.getenv("MYSQL_USER", "root"),
-        "password": os.getenv("MYSQL_PASSWORD", ""),
-        "database": os.getenv("MYSQL_DATABASE", "ai_sales"),
+        "host": _get_setting("MYSQL_HOST", "localhost"),
+        "port": int(_get_setting("MYSQL_PORT", "3306")),
+        "user": _get_setting("MYSQL_USER", "root"),
+        "password": _get_setting("MYSQL_PASSWORD", ""),
+        "database": _get_setting("MYSQL_DATABASE", "ai_sales"),
     }
 
 

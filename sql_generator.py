@@ -13,13 +13,32 @@ from database import get_schema_string
 
 load_dotenv()
 
-# Default model if not specified in .env
+# Default model if not specified in .env or secrets
 DEFAULT_MODEL = "openai/gpt-oss-120b"
+
+
+def _get_setting(key, default=""):
+    """
+    Retrieve configuration from Streamlit secrets first, falling back to os.getenv().
+    Safely handles environments where Streamlit or secrets are not available.
+    """
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets") and key in st.secrets:
+            val = st.secrets[key]
+            if val is not None and str(val) != "":
+                return str(val)
+    except Exception:
+        pass
+    val = os.getenv(key)
+    if val is not None and str(val) != "":
+        return str(val)
+    return default
 
 
 def _get_client(api_key=None):
     """Create and return a Groq client."""
-    key = api_key or os.getenv("GROQ_API_KEY")
+    key = api_key or _get_setting("GROQ_API_KEY")
     if not key:
         raise ValueError(
             "GROQ_API_KEY is not set. "
@@ -30,7 +49,7 @@ def _get_client(api_key=None):
 
 def _get_model():
     """Return the configured Groq model name."""
-    return os.getenv("GROQ_MODEL", DEFAULT_MODEL)
+    return _get_setting("GROQ_MODEL", DEFAULT_MODEL)
 
 
 def _build_system_prompt(schema):
